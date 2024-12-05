@@ -9,7 +9,7 @@ db = SQLAlchemy(app)
 
 # Model to store booking data
 class Booking(db.Model):
-    booking_id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, primary_key=True)  # Auto-increment ID can be used in production
     theatre = db.Column(db.String(100), nullable=False)
     movie = db.Column(db.String(100), nullable=False)
     date = db.Column(db.String(10), nullable=False)
@@ -23,42 +23,52 @@ class Booking(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/book', methods=['POST'])
+from flask import Flask, request, jsonify, render_template
+
+@app.route('/book', methods=['GET', 'POST'])
 def book_ticket():
-    data = request.json
-    # Generating a random booking ID
-    booking_id = random.randint(10000, 99999)
+    if request.method == 'GET':
+        # Render the HTML form for ticket booking
+        return render_template('book.html')
     
-    # Extracting data from the request
-    theatre = data['theatre']
-    movie = data['movie']
-    date = data['date']
-    time = data['time']
-    screen = data['screen']
-    popcorn_count = data['popcorn_count']
-    coke_count = data['coke_count']
-    total = data['total']
-    
-    # Create new booking record
-    new_booking = Booking(
-        booking_id=booking_id,
-        theatre=theatre,
-        movie=movie,
-        date=date,
-        time=time,
-        screen=screen,
-        popcorn_count=popcorn_count,
-        coke_count=coke_count,
-        total=total
-    )
-    
-    db.session.add(new_booking)
-    db.session.commit()
-    
-    return jsonify({
-        'message': 'Booking confirmed!',
-        'booking_id': booking_id
-    })
+    elif request.method == 'POST':
+        # Handle the ticket booking
+        data = request.json  # Ensure the request is JSON
+        
+        # Generating a random booking ID
+        booking_id = random.randint(10000, 99999)
+        
+        # Extracting data from the request
+        theatre = data['theatre']
+        movie = data['movie']
+        date = data['date']
+        time = data['time']
+        screen = data['screen']
+        popcorn_count = data['popcorn_count']
+        coke_count = data['coke_count']
+        total = data['total']
+        
+        # Create new booking record
+        new_booking = Booking(
+            booking_id=booking_id,
+            theatre=theatre,
+            movie=movie,
+            date=date,
+            time=time,
+            screen=screen,
+            popcorn_count=popcorn_count,
+            coke_count=coke_count,
+            total=total
+        )
+        
+        db.session.add(new_booking)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Booking confirmed!',
+            'booking_id': booking_id
+        })
+
 
 @app.route('/cancel/<int:booking_id>', methods=['DELETE'])
 def cancel_booking(booking_id):

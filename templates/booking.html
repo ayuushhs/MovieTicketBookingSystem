@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Ticket Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 80%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button-group button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .button-group button:nth-child(1) {
+            background-color: #ffc107;
+        }
+
+        .button-group button:nth-child(2) {
+            background-color: #28a745;
+        }
+
+        .button-group button:nth-child(3) {
+            background-color: #007bff;
+        }
+
+        .food-section button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        #total {
+            font-weight: bold;
+            color: #dc3545;
+            margin-top: 10px;
+        }
+
+        #confirmation {
+            display: none;
+            font-size: 24px;
+            color: green;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #booking-details {
+            margin-top: 20px;
+            display: none;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+        }
+
+        #cancel-button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Movie Ticket Booking System</h1>
+
+        <!-- Theatre Section -->
+        <div class="section">
+            <h2>Select Theatre</h2>
+            <select id="theatre">
+                <option value="PVR">PVR</option>
+                <option value="INOX">INOX</option>
+                <option value="CINEPOLIS">CINEPOLIS</option>
+            </select>
+        </div>
+
+        <!-- Movie Section -->
+        <div class="section">
+            <h2>Select Movie</h2>
+            <select id="movie">
+                <option value="INTERSTELLAR">INTERSTELLAR</option>
+                <option value="DONKYKONG">DONKYKONG</option>
+                <option value="REVENANT">REVENANT</option>
+            </select>
+        </div>
+
+        <!-- Date Section -->
+        <div class="section">
+            <h2>Select Date</h2>
+            <input type="date" id="date">
+        </div>
+
+        <!-- Time Section -->
+        <div class="section">
+            <h2>Select Time</h2>
+            <select id="time">
+                <option value="17:00">17:00</option>
+                <option value="23:00">23:00</option>
+                <option value="22:25">22:25</option>
+                <option value="06:00">06:00</option>
+            </select>
+        </div>
+
+        <!-- Screens Section -->
+        <div class="section">
+            <h2>Select Screen</h2>
+            <div class="button-group">
+                <button onclick="selectScreen('VIP', 50)">VIP - $50</button>
+                <button onclick="selectScreen('GOLD', 30)">GOLD - $30</button>
+                <button onclick="selectScreen('REGULAR', 20)">REGULAR - $20</button>
+            </div>
+        </div>
+
+        <!-- Food Section -->
+        <div class="section food-section">
+            <h2>Select Food or Beverages</h2>
+            <div>
+                Popcorn - $10: <button onclick="updateCount('popcorn', 1)">+</button> 
+                <span id="popcorn-count">0</span> 
+                <button onclick="updateCount('popcorn', -1)">-</button>
+            </div>
+            <div>
+                Coke - $10: <button onclick="updateCount('coke', 1)">+</button> 
+                <span id="coke-count">0</span> 
+                <button onclick="updateCount('coke', -1)">-</button>
+            </div>
+        </div>
+
+        <!-- Total Section -->
+        <div id="total">Total: $0</div>
+
+        <!-- Buttons -->
+        <div class="section">
+            <button onclick="bookNow()">Book Now</button>
+            <div id="confirmation">Booking is confirmed!</div>
+        </div>
+
+        <!-- Booking Details -->
+        <div id="booking-details">
+            <h2>Booking Details</h2>
+            <p id="details"></p>
+            <button id="cancel-button" onclick="cancelBooking()">Cancel Booking</button>
+        </div>
+    </div>
+
+    <script>
+        let total = 0;
+        let selectedScreen = '';
+        let screenPrice = 0;
+        let popcornCount = 0;
+        let cokeCount = 0;
+        let bookingId = 0;
+
+        function selectScreen(screen, price) {
+            selectedScreen = screen;
+            total -= screenPrice; // Remove previous selection
+            screenPrice = price;
+            total += screenPrice;
+            updateTotal();
+        }
+
+        function updateCount(item, change) {
+            if (item === 'popcorn') {
+                popcornCount = Math.max(0, popcornCount + change);
+                total += change * 10;
+            } else if (item === 'coke') {
+                cokeCount = Math.max(0, cokeCount + change);
+                total += change * 10;
+            }
+            document.getElementById(`${item}-count`).textContent = item === 'popcorn' ? popcornCount : cokeCount;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            document.getElementById('total').textContent = `Total: $${total}`;
+        }
+
+        function bookNow() {
+            const theatre = document.getElementById('theatre').value;
+            const movie = document.getElementById('movie').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            if (!selectedScreen || !theatre || !movie || !date || !time) {
+                alert("Please fill all the fields!");
+                return;
+            }
+
+            // Generate a random booking ID
+            bookingId = Math.floor(Math.random() * 100000);
+            
+            const bookingData = {
+                bookingId: bookingId,
+                theatre: theatre,
+                movie: movie,
+                date: date,
+                time: time,
+                screen: selectedScreen,
+                popcornCount: popcornCount,
+                cokeCount: cokeCount,
+                total: total
+            };
+
+            // Send booking data to backend via POST request
+            fetch('/book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('confirmation').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('confirmation').style.display = 'none';
+                    document.getElementById('booking-details').style.display = 'block';
+                    document.getElementById('details').innerHTML = `
+                        Booking ID: ${data.bookingId}<br>
+                        Theatre: ${data.theatre}<br>
+                        Movie: ${data.movie}<br>
+                        Date: ${data.date}<br>
+                        Time: ${data.time}<br>
+                        Screen: ${data.screen}<br>
+                        Popcorn: ${data.popcornCount}<br>
+                        Coke: ${data.cokeCount}<br>
+                        Total: $${data.total}
+                    `;
+                }, 2000);
+            })
+            .catch(error => {
+                alert("Booking failed, please try again.");
+                console.error("Error booking ticket:", error);
+            });
+        }
+
+        function cancelBooking() {
+            // Send cancel request to backend via DELETE request
+            fetch(`/cancel/${bookingId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(() => {
+                document.getElementById('booking-details').style.display = 'none';
+                alert("Booking canceled!");
+                resetBooking();
+            })
+            .catch(error => {
+                alert("Failed to cancel the booking.");
+                console.error("Error canceling booking:", error);
+            });
+        }
+
+        function resetBooking() {
+            // Reset all variables
+            total = 0;
+            selectedScreen = '';
+            screenPrice = 0;
+            popcornCount = 0;
+            cokeCount = 0;
+            updateTotal();
+        }
+    </script>
+</body>
+</html>
